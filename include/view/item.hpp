@@ -36,7 +36,7 @@ public:
 	}
 	virtual ~Item() = default;
 	
-	virtual QRectF boundingRect() const {
+	virtual QRectF boundingRect() const override {
 		return QRectF(-size, -size, 2*size, 2*size);
 	}
 	

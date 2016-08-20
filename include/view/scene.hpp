@@ -16,7 +16,7 @@
 
 class Scene : public QGraphicsScene {
 public:
-	std::map<long, Item*> items;
+	std::map<int, Item*> items;
 	World *world = nullptr;
 
 	Scene(World *w) : QGraphicsScene() {
