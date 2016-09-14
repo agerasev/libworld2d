@@ -10,8 +10,8 @@
 #include <la/vec.hpp>
 #include <la/mat.hpp>
 
-//#include "random.hpp"
-#include <core/entity.hpp>
+#include "entity.hpp"
+
 
 class World {
 public:
@@ -19,20 +19,15 @@ public:
 	
 	std::map<int, Entity*> entities;
 	std::mutex access;
-	std::function<void(void)> sync;
 	
 	bool done = false;
 	bool paused = false;
 	
 	vec2 size;
 	
-	int delay = 40000; // us
+	double delay = 40.0; // ms
 	double step_duration = 0.0; // ms
 	int steps_elapsed = 0;
-	
-	void setDelay(int ms) {
-		delay = ms;
-	}
 	
 	World(const vec2 &s) {
 		size = s;
@@ -47,6 +42,7 @@ public:
 		entities.insert(std::pair<int, Entity*>(id_counter++, e));
 	}
 	
+	/*
 	void interact() {
 		for(auto &p : entities) {
 			Entity *e = p.second;
@@ -82,9 +78,9 @@ public:
 	}
 	
 	virtual void step() = 0;
+	*/
 	
 	void operator()() {
-		auto last_draw_time = std::chrono::steady_clock::now();
 		while(!done) {
 			if(paused) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(40));
@@ -94,21 +90,16 @@ public:
 			auto begin_time = std::chrono::steady_clock::now();
 			access.lock();
 			{
-				step();
+				// step();
 			}
 			access.unlock();
+			auto end_time = std::chrono::steady_clock::now();
 			
-			auto current_time = std::chrono::steady_clock::now();
-			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - last_draw_time);
-			if(duration >= std::chrono::milliseconds(20)) {
-				sync();
-				last_draw_time = current_time;
-			}
-			step_duration = 1e-3*std::chrono::duration_cast<std::chrono::microseconds>(current_time - begin_time).count();
+			step_duration = 1e-3*std::chrono::duration_cast<std::chrono::microseconds>(end_time - begin_time).count();
 			
 			steps_elapsed += 1;
 			
-			std::this_thread::sleep_for(std::chrono::microseconds(delay));
+			std::this_thread::sleep_for(std::chrono::microseconds(int(1e3*delay)));
 		}
 	}
 };

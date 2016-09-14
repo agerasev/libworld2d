@@ -9,17 +9,21 @@ public:
 	bool interactive = true;
 	
 	double mass = 1.0;
-	vec2 pos = nullvec2;
-	vec2 vel = nullvec2;
 	
-	virtual double size() const = 0;
+	vec2 pos = vec2(0,0);
+	vec2 vel = vec2(0,0);
+	vec2 acc = vec2(0,0);
+	
+	virtual double size() const {
+		return sqrt(mass);
+	}
 	
 	Entity() = default;
 	virtual ~Entity() = default;
 	
-	virtual void interact(Entity *e) {}
-	
 	virtual void move(double dt) {
+		vel += acc*dt;
 		pos += vel*dt;
+		acc = vec2(0,0);
 	}
 };
